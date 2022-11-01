@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/user.model");
 
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
@@ -6,9 +7,9 @@ function authenticateToken(req, res, next) {
 
   if (token === null) return res.sendStatus(401, "Token can't be null");
 
-  jwt.verify(token, "Snipppet_SECRETKEY", (err, user) => {
+  jwt.verify(token, "Snipppet_SECRETKEY", async (err, user) => {
     if (err) return res.sendStatus(403);
-    req.user = user;
+    req.user = await User.findOne({ username: user.data });
     next();
   });
 }

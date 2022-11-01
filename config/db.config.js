@@ -1,3 +1,3 @@
 module.exports = {
-  db: "mongodb://mongo_db:27017",
+  db: "mongodb://localhost:27017/realtime-chat",
 };

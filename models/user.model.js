@@ -16,7 +16,7 @@ const userSchema = new Schema({
     trim: true,
     minlength: 3,
   },
-  avatar: {
+  profilePicture: {
     type: String,
     required: false,
     trim: true,

@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 const dbConfig = require("./config/db.config");
 
@@ -9,6 +10,7 @@ const errors = require("./middlewares/errors");
 const { unless } = require("express-unless");
 
 const app = express();
+app.use(cors());
 
 mongoose.Promise = global.Promise;
 mongoose
@@ -36,7 +38,9 @@ app.use(
 );
 
 app.use(express.json());
+
 app.use("/users", require("./routes/users.routes"));
+app.use("/messages", require("./routes/messages.routes"));
 
 app.use(errors.errorHandler);
 
