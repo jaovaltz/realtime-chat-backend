@@ -9,6 +9,8 @@ const errors = require("./middlewares/errors");
 
 const { unless } = require("express-unless");
 
+const socket = require("socket.io");
+
 const app = express();
 app.use(cors());
 
@@ -44,6 +46,37 @@ app.use("/messages", require("./routes/messages.routes"));
 
 app.use(errors.errorHandler);
 
-app.listen(process.env.PORT || 3001, () => {
+const server = app.listen(process.env.PORT || 3001, () => {
   console.log("Server is ready");
+});
+
+const io = socket(server, {
+  cors: {
+    origin: "*",
+    credentials: true,
+  },
+});
+
+global.onlineUsers = new Map();
+io.on("connection", (socket) => {
+  global.chatSocket = socket;
+  socket.on("add-user", (userId) => {
+    onlineUsers.set(userId, socket.id);
+  });
+
+  socket.on("send-msg", async (data) => {
+    const token = data.from;
+    const user = await auth.quickAuth(token);
+
+    const receiverSocketId = onlineUsers.get(data.to);
+    const sendUserSocket = onlineUsers.get(user.id);
+    console.log(data);
+
+    if (sendUserSocket) {
+      socket.to(sendUserSocket).emit("receive-msg", {
+        fromSender: false,
+        message: data.message,
+      });
+    }
+  });
 });
